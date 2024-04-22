@@ -1,4 +1,4 @@
-package es.rodal.biblioteca;
+package es.rodal.biblioteca.bbdd;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
