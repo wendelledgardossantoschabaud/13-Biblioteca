@@ -62,10 +62,7 @@ public class Usuario {
 	}
 	
 	public void setTipo_usuario(String tipo_usuario) {
-		if (TipoUsuario.SOCIO.name().equalsIgnoreCase(tipo_usuario)) {
-			this.tipo_usuario = TipoUsuario.SOCIO;
-		}
-		this.tipo_usuario = TipoUsuario.OCASIONAL;
+		this.tipo_usuario = TipoUsuario.valueOf(tipo_usuario.toUpperCase());
 	}
 
 	public void hacerSocio() {
@@ -73,13 +70,8 @@ public class Usuario {
 	}
 	
 	public LocalDate fechaDevolucion(LocalDate fecha, Documento documento) {
-		int numDias;
 		
-		if (this.tipo_usuario.name().equals(TipoUsuario.SOCIO.name())) {
-			numDias = 30;
-		} else {
-			numDias = 15;
-		}
+		int numDias = this.tipo_usuario.getMaxDiasLibro();
 		
 		if (documento instanceof Revista) {
 			numDias = numDias/3;
@@ -88,6 +80,7 @@ public class Usuario {
 		return fecha.plusDays(numDias);
 	}
 
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
