@@ -64,7 +64,7 @@ public class ConsultasPrestamos {
 	/**
 	 * Método que devuelve el numero de prestamos sin devolver que tiene un usuario en la base de datos
 	 * @param usuario
-	 * @return
+	 * @return numero documentos prestados
 	 * @throws SQLException
 	 */
 	public static int contarPrestados (Usuario usuario) throws SQLException {

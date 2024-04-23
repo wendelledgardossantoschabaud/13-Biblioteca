@@ -1,6 +1,11 @@
 package es.rodal.biblioteca.models;
 
-public class Libro extends Documento{
+/**
+ * Clase que extiende de Documento y añade el anño de publicacion
+ * @author Admin
+ *
+ */
+public class Libro extends Documento {
 	
 	private int anhoPublicacion;
 	

@@ -2,6 +2,12 @@ package es.rodal.biblioteca.models;
 
 import java.time.LocalDate;
 
+/**
+ * Clase Usuario que siempre inicializa el TipoUsuario en OCASIONAL, tiene todos los getters y setters
+ * y un par de métodos necesarios para calcular la fecha de devolucion y para hacer socio a un usuario
+ * @author Admin
+ *
+ */
 public class Usuario {
 
 	private int id_usuario;
@@ -61,14 +67,17 @@ public class Usuario {
 		this.tipo_usuario = tipo_usuario;
 	}
 	
+	//Método setTipo_usuario que recibe un String y asigna si coincide con un TipoUsuario
 	public void setTipo_usuario(String tipo_usuario) {
 		this.tipo_usuario = TipoUsuario.valueOf(tipo_usuario.toUpperCase());
 	}
 
+	//Método que cambia el TipoUsuario a SOCIO
 	public void hacerSocio() {
 		this.tipo_usuario = TipoUsuario.SOCIO;
 	}
 	
+	//Método que devuelve la fecha maxima a la que puede devolver el documento proporcionado
 	public LocalDate fechaDevolucion(LocalDate fecha, Documento documento) {
 		
 		int numDias = this.tipo_usuario.getMaxDiasLibro();
@@ -80,7 +89,6 @@ public class Usuario {
 		return fecha.plusDays(numDias);
 	}
 
-	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

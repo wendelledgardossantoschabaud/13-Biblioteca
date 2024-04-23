@@ -1,5 +1,10 @@
 package es.rodal.biblioteca.models;
 
+/**
+ * Clase padre Documento de la que heredan Libro y Revista 
+ * @author Admin
+ *
+ */
 public abstract class Documento {
 	private String id_documento;
 	private String titulo;

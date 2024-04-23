@@ -1,5 +1,10 @@
 package es.rodal.biblioteca.models;
 
+/**
+ * Clase que hereda de Documento 
+ * @author Admin
+ *
+ */
 public class Revista extends Documento {
 
 	public Revista() {
