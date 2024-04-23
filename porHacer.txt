@@ -1,8 +1,0 @@
-faltan los casos de uso
-
-LISTO:
--consultas de documento está hecho insert, delete y select(por id_documento)	+comprueba si un libro esta disponible para prestar	
--consultas de usuario está hecho insert, delete y select(por dni)			+comprueba si puede tomar mas libros prestados
--consultas de prestamo está hecho insert, devolucion de un libro			+devuelve numero de documentos prestados de un usuario
-
--clase usuario tiene un método que devuelve la fecha maxima de devolucion de un documento a partir de la fecha proporcionada y el documento

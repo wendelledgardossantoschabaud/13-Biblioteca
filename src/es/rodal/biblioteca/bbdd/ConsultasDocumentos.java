@@ -17,6 +17,7 @@ public class ConsultasDocumentos {
 	private static final String INSERT_REVISTA = "INSERT INTO documentos(id_documento, titulo, tipo_documento) VALUES (?, ?, ?)";
 	private static final String DELETE_DOCUMENTO = "DELETE FROM documentos WHERE id_documento = ?";
 	private static final String DOCUMENTO_PRESTADO = "SELECT disponible FROM documentos WHERE id_documento = ?";
+	private static final String CONSULTA_DOCUMENTO_POR_TITULO = "SELECT * FROM documentos WHERE titulo LIKE ?";
 	
 	/**
 	 * Método que realiza un insert de un documento en la base de datos, este método comprueba
@@ -96,7 +97,7 @@ public class ConsultasDocumentos {
 	 * @return disponible
 	 * @throws SQLException
 	 */
-	public static boolean documentoDisponible (Documento documento) throws SQLException {
+	public static boolean documentoDisponible(Documento documento) throws SQLException {
 		try(Connection connection = Conexion.conectar();
 				PreparedStatement statement = connection.prepareStatement(DOCUMENTO_PRESTADO);) {
 			
@@ -112,4 +113,38 @@ public class ConsultasDocumentos {
 			return false;
 		}
 	}
+	
+	/**
+	 * Método que devuelve un documento que su titulo contenga el String proporcionado
+	 * @param titulo
+	 * @return documento
+	 * @throws SQLException
+	 */
+	public static Documento findTitulo(String titulo) throws SQLException {
+		Documento documento = null;
+
+		try (Connection connection = Conexion.conectar();
+				PreparedStatement statement = connection.prepareStatement(CONSULTA_DOCUMENTO_POR_TITULO);) {
+			statement.setString(1, "%"+titulo+"%");
+
+			try (ResultSet resultSet = statement.executeQuery()) {
+				//Creacion de Libro o Revista dependiendo del tipo_documento
+				if (resultSet.next()) {
+					if (resultSet.getString("tipo_documento").equalsIgnoreCase(TipoDocumento.LIBRO.name())) {
+						documento = new Libro();
+					} else {
+						documento = new Revista();
+					}
+					documento.setId_documento(resultSet.getString("id_documento"));
+					documento.setTitulo(resultSet.getString("titulo"));
+					//Agregacion de añnho_publicacion si es un Libro
+					if (documento instanceof Libro) {
+						((Libro) documento).setAnhoPublicacion(resultSet.getInt("anho_publicacion"));
+					}
+				}
+			}
+		}
+		return documento;
+	}
+	
 }

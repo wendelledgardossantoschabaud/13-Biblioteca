@@ -11,6 +11,7 @@ import es.rodal.biblioteca.models.Usuario;
 public class ConsultasUsuarios {
 
 	private static final String CONSULTA_USUARIO_POR_DNI = "SELECT id_usuario, nombre, apellidos, tipo_usuario FROM usuarios WHERE dni = ?";
+	private static final String CONSULTA_USUARIO_POR_ID = "SELECT id_usuario, dni, nombre, apellidos, tipo_usuario FROM usuarios WHERE id_usuario = ?";
 	private static final String INSERT_USUARIO = "INSERT INTO usuarios(dni, nombre, apellidos, tipo_usuario) VALUES (?, ?, ?, ?)";
 	private static final String DELETE_USUARIO = "DELETE FROM usuarios WHERE dni = ?";
 
@@ -48,6 +49,34 @@ public class ConsultasUsuarios {
 					usuario = new Usuario();
 					usuario.setDni(dni);
 					usuario.setId_usuario(resultSet.getInt("id_usuario"));
+					usuario.setNombre(resultSet.getString("nombre"));
+					usuario.setApellidos(resultSet.getString("apellidos"));
+					usuario.setTipo_usuario(TipoUsuario.valueOf(resultSet.getString("tipo_usuario").toUpperCase()));
+				}
+			}
+		}
+		return usuario;
+	}
+
+
+	/**
+	 * Método que busca un usuario en la bbdd a partir de un id_usuario, crea un objeto Usuario y lo devuelve
+	 * @param id_usuario
+	 * @return usuario
+	 * @throws SQLException
+	 */
+	public static Usuario findId(int id_usuario) throws SQLException {
+		Usuario usuario = null;
+
+		try (Connection connection = Conexion.conectar();
+				PreparedStatement statement = connection.prepareStatement(CONSULTA_USUARIO_POR_ID);) {
+			statement.setInt(1, id_usuario);
+
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (resultSet.next()) {
+					usuario = new Usuario();
+					usuario.setId_usuario(resultSet.getInt("id_usuario"));
+					usuario.setDni(resultSet.getString("dni"));
 					usuario.setNombre(resultSet.getString("nombre"));
 					usuario.setApellidos(resultSet.getString("apellidos"));
 					usuario.setTipo_usuario(TipoUsuario.valueOf(resultSet.getString("tipo_usuario").toUpperCase()));
