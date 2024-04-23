@@ -16,9 +16,15 @@ public class ConsultasPrestamos {
 	private static final String UPDATE_DEVOLVER_DOCUMENTO = "UPDATE prestamos SET fecha_devolucion = ?, devuelto = ? WHERE id_usuario = ? AND id_documento = ?";
 	private static final String COUNT_PRESTADOS = "SELECT count(*) AS prestados FROM prestamos WHERE id_usuario = ? AND devuelto = 0";
 	
-	
-	
-	
+	/**
+	 * Método que comprueba si el Documento sigue disponible para prestar y si el Usuario no ha alcanzado el
+	 * máximo de documentos. Si estás condiciones se cumplen se insertará un prestamo en la base de datos
+	 * lo que provocará que se ejecute un trigger en la bbdd para quitar la disponibilidad de ese documento
+	 * @param usuario
+	 * @param documento
+	 * @param fecha
+	 * @throws SQLException
+	 */
 	public static void insertPrestamo(Usuario usuario, Documento documento, LocalDate fecha) throws SQLException {
 		
 		if (ConsultasUsuarios.tomarPrestado(usuario) && ConsultasDocumentos.documentoDisponible(documento)) {
@@ -35,6 +41,14 @@ public class ConsultasPrestamos {
 		}
 	}
 	
+	/**
+	 * Método que cambia el campo devuelto en la tabla prestamos y actualiza la fecha de devolución, tambien
+	 * provoca un trigger en la base de datos que cambiará el campo disponible del documento devuelto
+	 * @param usuario
+	 * @param documento
+	 * @param fecha
+	 * @throws SQLException
+	 */
 	public static void devolverDocumento(Usuario usuario, Documento documento, LocalDate fecha) throws SQLException {
 		
 		try (Connection connection = Conexion.conectar();
@@ -47,6 +61,12 @@ public class ConsultasPrestamos {
 		}
 	}
 	
+	/**
+	 * Método que devuelve el numero de prestamos sin devolver que tiene un usuario en la base de datos
+	 * @param usuario
+	 * @return
+	 * @throws SQLException
+	 */
 	public static int contarPrestados (Usuario usuario) throws SQLException {
 		try (Connection connection = Conexion.conectar();
 				PreparedStatement statement = connection.prepareStatement(COUNT_PRESTADOS);) {

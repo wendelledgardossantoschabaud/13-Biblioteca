@@ -18,6 +18,13 @@ public class ConsultasDocumentos {
 	private static final String DELETE_DOCUMENTO = "DELETE FROM documentos WHERE id_documento = ?";
 	private static final String DOCUMENTO_PRESTADO = "SELECT disponible FROM documentos WHERE id_documento = ?";
 	
+	/**
+	 * Método que realiza un insert de un documento en la base de datos, este método comprueba
+	 * si es una revista o un libro para insertarlo en la base de datos y añadir año de publicacion
+	 * si es un libro
+	 * @param documento
+	 * @throws SQLException
+	 */
 	public static void insertDocumento(Documento documento) throws SQLException {
 
 		String insert = documento instanceof Libro ? INSERT_LIBRO : INSERT_REVISTA;
@@ -36,6 +43,12 @@ public class ConsultasDocumentos {
 		}
 	}
 
+	/**
+	 * Método que devuelve un documento a partir de un id_documento proporcionado
+	 * @param id_documento
+	 * @return
+	 * @throws SQLException
+	 */
 	public static Documento findDocumento(String id_documento) throws SQLException {
 		Documento documento = null;
 
@@ -44,6 +57,7 @@ public class ConsultasDocumentos {
 			statement.setString(1, id_documento);
 
 			try (ResultSet resultSet = statement.executeQuery()) {
+				//Creacion de Libro o Revista dependiendo del tipo_documento
 				if (resultSet.next()) {
 					if (resultSet.getString("tipo_documento").equalsIgnoreCase(TipoDocumento.LIBRO.name())) {
 						documento = new Libro();
@@ -52,6 +66,7 @@ public class ConsultasDocumentos {
 					}
 					documento.setId_documento(id_documento);
 					documento.setTitulo(resultSet.getString("titulo"));
+					//Agregacion de añnho_publicacion si es un Libro
 					if (documento instanceof Libro) {
 						((Libro) documento).setAnhoPublicacion(resultSet.getInt("anho_publicacion"));
 					}
@@ -61,7 +76,11 @@ public class ConsultasDocumentos {
 		return documento;
 	}
 	
-	
+	/**
+	 * Método que elimina un documento a partir de su id
+	 * @param id_documento
+	 * @throws SQLException
+	 */
 	public static void deleteDocumento(String id_documento) throws SQLException {
 		try (Connection connection = Conexion.conectar();
 				PreparedStatement statement = connection.prepareStatement(DELETE_DOCUMENTO);) {
@@ -71,7 +90,12 @@ public class ConsultasDocumentos {
 		}
 	}
 	
-	
+	/**
+	 * Método que devuelve true si el documento sigue disponible para prestar en la base de datos
+	 * @param documento
+	 * @return disponible
+	 * @throws SQLException
+	 */
 	public static boolean documentoDisponible (Documento documento) throws SQLException {
 		try(Connection connection = Conexion.conectar();
 				PreparedStatement statement = connection.prepareStatement(DOCUMENTO_PRESTADO);) {

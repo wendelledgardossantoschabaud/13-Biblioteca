@@ -4,11 +4,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Clase que maneja la conexión con la base de datos mysql
+ * @author Admin
+ *
+ */
 public class Conexion {
 	 private final static String url = "jdbc:mysql://localhost:3306/biblioteca";
 	 private final static String username = "root";
 	 private final static String password = "root";
 
+	 /**
+	  * Método que devuelve la conexion realizada con el esquema y los credenciales proporcionados
+	  * por la clase
+	  * @return conexion
+	  */
 	 public static Connection conectar() {
 		 Connection conexion = null;
 		// System.out.println("Loading driver ...");

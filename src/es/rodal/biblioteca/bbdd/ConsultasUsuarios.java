@@ -14,6 +14,11 @@ public class ConsultasUsuarios {
 	private static final String INSERT_USUARIO = "INSERT INTO usuarios(dni, nombre, apellidos, tipo_usuario) VALUES (?, ?, ?, ?)";
 	private static final String DELETE_USUARIO = "DELETE FROM usuarios WHERE dni = ?";
 
+	/**
+	 * Método que inserta un usuario proporcionado como parametro
+	 * @param usuario
+	 * @throws SQLException
+	 */
 	public static void insertUsuario(Usuario usuario) throws SQLException {
 		try (Connection connection = Conexion.conectar();
 				PreparedStatement statement = connection.prepareStatement(INSERT_USUARIO);) {
@@ -25,6 +30,12 @@ public class ConsultasUsuarios {
 		}
 	}
 
+	/**
+	 * Método que busca un usuario en la bbdd a partir de un dni, crea un objeto Usuario y lo devuelve
+	 * @param dni
+	 * @return usuario
+	 * @throws SQLException
+	 */
 	public static Usuario findDni(String dni) throws SQLException {
 		Usuario usuario = null;
 
@@ -46,6 +57,12 @@ public class ConsultasUsuarios {
 		return usuario;
 	}
 
+	/**
+	 * Método que elimina un usuario de la bbdd a partir de un dni proporcionado pero solo se
+	 * ejecutará si este usuario no tiene ningun documento prestado
+	 * @param dni
+	 * @throws SQLException
+	 */
 	public static void deleteDni(String dni) throws SQLException {
 		Usuario usuarioDni = findDni(dni);
 		if (ConsultasPrestamos.contarPrestados(usuarioDni) > 0) {
@@ -59,6 +76,13 @@ public class ConsultasUsuarios {
 		}
 	}
 	
+	/**
+	 * Método que comprueba si el Usuario proporcionado puede tomar prestados mas documentos 
+	 * o ya ha alcanzado su limite (20 para socios y 2 para ocasionales)
+	 * @param usuario
+	 * @return
+	 * @throws SQLException
+	 */
 	public static boolean tomarPrestado (Usuario usuario) throws SQLException {
 		boolean puede = false;
 		if (ConsultasPrestamos.contarPrestados(usuario) < usuario.getTipo_usuario().getMaxDocumentos()) {
