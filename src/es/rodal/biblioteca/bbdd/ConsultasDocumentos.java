@@ -1,5 +1,6 @@
 package es.rodal.biblioteca.bbdd;
 
+import java.nio.file.ProviderNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,12 +13,36 @@ import es.rodal.biblioteca.models.TipoDocumento;
 
 public class ConsultasDocumentos {
 
-	private static final String CONSULTA_DOCUMENTO_POR_ID = "SELECT * FROM documentos WHERE id_documento = ?";
 	private static final String INSERT_LIBRO = "INSERT INTO documentos(id_documento, titulo, anho_publicacion, tipo_documento) VALUES (?, ?, ?, ?)";
 	private static final String INSERT_REVISTA = "INSERT INTO documentos(id_documento, titulo, tipo_documento) VALUES (?, ?, ?)";
-	private static final String DELETE_DOCUMENTO = "DELETE FROM documentos WHERE id_documento = ?";
-	private static final String DOCUMENTO_PRESTADO = "SELECT disponible FROM documentos WHERE id_documento = ?";
-	private static final String CONSULTA_DOCUMENTO_POR_TITULO = "SELECT * FROM documentos WHERE titulo LIKE ?";
+	private static final String DOCUMENTO_POR_TITULO = "SELECT * FROM documentos WHERE titulo LIKE ?;";
+	
+	public static Documento findDocumentoPorTitulo(String titulo) {
+		Documento documento = null;
+		try (Connection conn = Conexion.conectar();
+				PreparedStatement ps = conn.prepareStatement(DOCUMENTO_POR_TITULO);
+				){
+			ps.setString(1, titulo);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				TipoDocumento tipo = TipoDocumento.valueOf(rs.getString("tipo_documento"));
+				String id = rs.getString("id_documetn");
+				String title = rs.getString("titulo");
+				if(tipo.name().equalsIgnoreCase("LIBRO")) {
+					int anhoPublicacion = rs.getInt("anho_publicacion");
+					documento = new Libro(id, title, anhoPublicacion);
+				}
+				if(tipo.name().equalsIgnoreCase("REVISTA")) {
+					documento = new Revista(id, title);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("No se ha podido encontrar el documento con titulo " + titulo);
+			e.printStackTrace();
+			throw new ProviderNotFoundException("Error. documento no encontrado.");
+		}
+		return documento;
+	}
 	
 	/**
 	 * Método que realiza un insert de un documento en la base de datos, este método comprueba
@@ -44,107 +69,7 @@ public class ConsultasDocumentos {
 		}
 	}
 
-	/**
-	 * Método que devuelve un documento a partir de un id_documento proporcionado
-	 * @param id_documento
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Documento findDocumento(String id_documento) throws SQLException {
-		Documento documento = null;
 
-		try (Connection connection = Conexion.conectar();
-				PreparedStatement statement = connection.prepareStatement(CONSULTA_DOCUMENTO_POR_ID);) {
-			statement.setString(1, id_documento);
 
-			try (ResultSet resultSet = statement.executeQuery()) {
-				//Creacion de Libro o Revista dependiendo del tipo_documento
-				if (resultSet.next()) {
-					if (resultSet.getString("tipo_documento").equalsIgnoreCase(TipoDocumento.LIBRO.name())) {
-						documento = new Libro();
-					} else {
-						documento = new Revista();
-					}
-					documento.setId_documento(id_documento);
-					documento.setTitulo(resultSet.getString("titulo"));
-					//Agregacion de añnho_publicacion si es un Libro
-					if (documento instanceof Libro) {
-						((Libro) documento).setAnhoPublicacion(resultSet.getInt("anho_publicacion"));
-					}
-				}
-			}
-		}
-		return documento;
-	}
-	
-	/**
-	 * Método que elimina un documento a partir de su id
-	 * @param id_documento
-	 * @throws SQLException
-	 */
-	public static void deleteDocumento(String id_documento) throws SQLException {
-		try (Connection connection = Conexion.conectar();
-				PreparedStatement statement = connection.prepareStatement(DELETE_DOCUMENTO);) {
-			
-			statement.setString(1, id_documento);
-			statement.execute();
-		}
-	}
-	
-	/**
-	 * Método que devuelve true si el documento sigue disponible para prestar en la base de datos
-	 * @param documento
-	 * @return disponible
-	 * @throws SQLException
-	 */
-	public static boolean documentoDisponible(Documento documento) throws SQLException {
-		try(Connection connection = Conexion.conectar();
-				PreparedStatement statement = connection.prepareStatement(DOCUMENTO_PRESTADO);) {
-			
-			statement.setString(1, documento.getId_documento());
-			
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (resultSet.next()) {
-					if (resultSet.getInt("disponible") != 0) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-	}
-	
-	/**
-	 * Método que devuelve un documento que su titulo contenga el String proporcionado
-	 * @param titulo
-	 * @return documento
-	 * @throws SQLException
-	 */
-	public static Documento findTitulo(String titulo) throws SQLException {
-		Documento documento = null;
-
-		try (Connection connection = Conexion.conectar();
-				PreparedStatement statement = connection.prepareStatement(CONSULTA_DOCUMENTO_POR_TITULO);) {
-			statement.setString(1, "%"+titulo+"%");
-
-			try (ResultSet resultSet = statement.executeQuery()) {
-				//Creacion de Libro o Revista dependiendo del tipo_documento
-				if (resultSet.next()) {
-					if (resultSet.getString("tipo_documento").equalsIgnoreCase(TipoDocumento.LIBRO.name())) {
-						documento = new Libro();
-					} else {
-						documento = new Revista();
-					}
-					documento.setId_documento(resultSet.getString("id_documento"));
-					documento.setTitulo(resultSet.getString("titulo"));
-					//Agregacion de añnho_publicacion si es un Libro
-					if (documento instanceof Libro) {
-						((Libro) documento).setAnhoPublicacion(resultSet.getInt("anho_publicacion"));
-					}
-				}
-			}
-		}
-		return documento;
-	}
 	
 }

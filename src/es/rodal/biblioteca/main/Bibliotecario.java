@@ -38,13 +38,12 @@ public class Bibliotecario {
                 switch (opcion) {
                     case 1://Selecciona un documento
                         System.out.println("Introduce el id del documento que quieras seleccionar: ");
-                        documentoSeleccionado = ConsultasDocumentos.findDocumento(scan.nextLine());
+
                         break;
                     case 2://Crea un prestamo si es posible
                     	if (documentoSeleccionado != null) {
                     		System.out.println("Introduce dni: ");
-                    		Usuario usuario = ConsultasUsuarios.findDni(scan.nextLine());
-                    		ConsultasPrestamos.insertPrestamo(usuario, documentoSeleccionado, LocalDate.now());
+
                     	} else {
                     		System.out.println("Primero es necesario seleccionar un documento");
                     	}
@@ -52,20 +51,18 @@ public class Bibliotecario {
                     case 3://Devuelve el prestamo
                     	if (documentoSeleccionado != null) {
                     		System.out.println("Introduce dni: ");
-                    		Usuario usuario = ConsultasUsuarios.findDni(scan.nextLine());
-                    		ConsultasPrestamos.devolverDocumento(usuario, documentoSeleccionado, LocalDate.now());
+
                     	} else {
                     		System.out.println("Primero es necesario seleccionar un documento");
                     	}
                         break;
                     case 4://Busca documento por titulo
                         System.out.println("Introduce titulo: ");
-                        documentoSeleccionado = ConsultasDocumentos.findTitulo(scan.nextLine());
-                        System.out.println(documentoSeleccionado);
+                        System.out.println(ConsultasDocumentos.findDocumentoPorTitulo(scan.nextLine()).toString());
                         break;
                     case 5://Devuelve informe prestamos no devueltos
                         System.out.println("Prestamos no devueltos:");
-                        ConsultasPrestamos.informePrestados();
+
                         break;
                     case 6:
                         salir = true;
